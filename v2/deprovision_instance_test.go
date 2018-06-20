@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"context"
 )
 
 func defaultDeprovisionRequest() *DeprovisionRequest {
@@ -218,7 +219,7 @@ func TestDeprovisionInstance(t *testing.T) {
 
 		klient := newTestClient(t, tc.name, tc.version, tc.enableAlpha, tc.httpChecks, tc.httpReaction)
 
-		response, err := klient.DeprovisionInstance(tc.request)
+		response, err := klient.DeprovisionInstance(context.TODO(), tc.request)
 
 		doResponseChecks(t, tc.name, response, err, tc.expectedResponse, tc.expectedErrMessage, tc.expectedErr)
 	}

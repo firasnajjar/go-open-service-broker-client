@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"context"
 )
 
 func defaultBindingLastOperationRequest() *BindingLastOperationRequest {
@@ -159,7 +160,7 @@ func TestPollBindingLastOperation(t *testing.T) {
 
 		klient := newTestClient(t, tc.name, tc.APIVersion, tc.enableAlpha, tc.httpChecks, tc.httpReaction)
 
-		response, err := klient.PollBindingLastOperation(tc.request)
+		response, err := klient.PollBindingLastOperation(context.TODO(), tc.request)
 
 		doResponseChecks(t, tc.name, response, err, tc.expectedResponse, tc.expectedErrMessage, tc.expectedErr)
 	}

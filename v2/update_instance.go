@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 )
 
 // internal message body types
@@ -20,7 +21,7 @@ type updateInstanceResponseBody struct {
 	Operation    *string `json:"operation"`
 }
 
-func (c *client) UpdateInstance(r *UpdateInstanceRequest) (*UpdateInstanceResponse, error) {
+func (c *client) UpdateInstance(ctx context.Context, r *UpdateInstanceRequest) (*UpdateInstanceResponse, error) {
 	if err := validateUpdateInstanceRequest(r); err != nil {
 		return nil, err
 	}
@@ -42,7 +43,7 @@ func (c *client) UpdateInstance(r *UpdateInstanceRequest) (*UpdateInstanceRespon
 		requestBody.Context = r.Context
 	}
 
-	response, err := c.prepareAndDo(http.MethodPatch, fullURL, params, requestBody, r.OriginatingIdentity)
+	response, err := c.prepareAndDo(ctx, http.MethodPatch, fullURL, params, requestBody, r.OriginatingIdentity)
 	if err != nil {
 		return nil, err
 	}

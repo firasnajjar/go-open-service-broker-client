@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 
 	"github.com/golang/glog"
 )
@@ -23,7 +24,7 @@ type provisionSuccessResponseBody struct {
 	Operation    *string `json:"operation"`
 }
 
-func (c *client) ProvisionInstance(r *ProvisionRequest) (*ProvisionResponse, error) {
+func (c *client) ProvisionInstance(ctx context.Context, r *ProvisionRequest) (*ProvisionResponse, error) {
 	if err := validateProvisionRequest(r); err != nil {
 		return nil, err
 	}
@@ -47,7 +48,7 @@ func (c *client) ProvisionInstance(r *ProvisionRequest) (*ProvisionResponse, err
 		requestBody.Context = r.Context
 	}
 
-	response, err := c.prepareAndDo(http.MethodPut, fullURL, params, requestBody, r.OriginatingIdentity)
+	response, err := c.prepareAndDo(ctx, http.MethodPut, fullURL, params, requestBody, r.OriginatingIdentity)
 	if err != nil {
 		return nil, err
 	}

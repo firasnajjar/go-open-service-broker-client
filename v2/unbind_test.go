@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"context"
 )
 
 func defaultUnbindRequest() *UnbindRequest {
@@ -195,7 +196,7 @@ func TestUnbind(t *testing.T) {
 
 		klient := newTestClient(t, tc.name, tc.version, tc.enableAlpha, tc.httpChecks, tc.httpReaction)
 
-		response, err := klient.Unbind(tc.request)
+		response, err := klient.Unbind(context.TODO(), tc.request)
 
 		doResponseChecks(t, tc.name, response, err, tc.expectedResponse, tc.expectedErrMessage, tc.expectedErr)
 	}

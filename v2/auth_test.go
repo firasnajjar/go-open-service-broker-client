@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"context"
 )
 
 func TestBasicAuth(t *testing.T) {
@@ -29,7 +30,7 @@ func TestBasicAuth(t *testing.T) {
 			BasicAuthConfig: tc.BasicAuthConfig,
 		}
 		client.doRequestFunc = addBasicAuthCheck(t, tc.name, tc.BasicAuthConfig, client.doRequestFunc)
-		client.prepareAndDo(http.MethodGet, client.URL, nil, nil, nil)
+		client.prepareAndDo(context.TODO(), http.MethodGet, client.URL, nil, nil, nil)
 	}
 }
 
@@ -55,7 +56,7 @@ func TestBearerAuth(t *testing.T) {
 			BearerConfig: tc.BearerConfig,
 		}
 		client.doRequestFunc = addBearerAuthCheck(t, tc.name, tc.BearerConfig, client.doRequestFunc)
-		client.prepareAndDo(http.MethodGet, client.URL, nil, nil, nil)
+		client.prepareAndDo(context.TODO(), http.MethodGet, client.URL, nil, nil, nil)
 	}
 }
 

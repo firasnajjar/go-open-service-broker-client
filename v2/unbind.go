@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 
 	"github.com/golang/glog"
 )
@@ -11,7 +12,7 @@ type unbindSuccessResponseBody struct {
 	Operation *string `json:"operation"`
 }
 
-func (c *client) Unbind(r *UnbindRequest) (*UnbindResponse, error) {
+func (c *client) Unbind(ctx context.Context, r *UnbindRequest) (*UnbindResponse, error) {
 	if r.AcceptsIncomplete {
 		if err := c.validateAlphaAPIMethodsAllowed(); err != nil {
 			return nil, AsyncBindingOperationsNotAllowedError{
@@ -32,7 +33,7 @@ func (c *client) Unbind(r *UnbindRequest) (*UnbindResponse, error) {
 		params[AcceptsIncomplete] = "true"
 	}
 
-	response, err := c.prepareAndDo(http.MethodDelete, fullURL, params, nil, r.OriginatingIdentity)
+	response, err := c.prepareAndDo(ctx, http.MethodDelete, fullURL, params, nil, r.OriginatingIdentity)
 	if err != nil {
 		return nil, err
 	}

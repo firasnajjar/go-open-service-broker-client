@@ -3,9 +3,10 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 )
 
-func (c *client) GetBinding(r *GetBindingRequest) (*GetBindingResponse, error) {
+func (c *client) GetBinding(ctx context.Context, r *GetBindingRequest) (*GetBindingResponse, error) {
 	if err := c.validateAlphaAPIMethodsAllowed(); err != nil {
 		return nil, GetBindingNotAllowedError{
 			reason: err.Error(),
@@ -14,7 +15,7 @@ func (c *client) GetBinding(r *GetBindingRequest) (*GetBindingResponse, error) {
 
 	fullURL := fmt.Sprintf(bindingURLFmt, c.URL, r.InstanceID, r.BindingID)
 
-	response, err := c.prepareAndDo(http.MethodGet, fullURL, nil /* params */, nil /* request body */, nil /* originating identity */)
+	response, err := c.prepareAndDo(ctx, http.MethodGet, fullURL, nil /* params */, nil /* request body */, nil /* originating identity */)
 	if err != nil {
 		return nil, err
 	}

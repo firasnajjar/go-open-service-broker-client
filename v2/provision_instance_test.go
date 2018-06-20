@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"context"
 )
 
 const (
@@ -317,7 +318,7 @@ func TestProvisionInstance(t *testing.T) {
 
 		klient := newTestClient(t, tc.name, tc.version, tc.enableAlpha, tc.httpChecks, tc.httpReaction)
 
-		response, err := klient.ProvisionInstance(tc.request)
+		response, err := klient.ProvisionInstance(context.TODO(), tc.request)
 
 		doResponseChecks(t, tc.name, response, err, tc.expectedResponse, tc.expectedErrMessage, tc.expectedErr)
 	}

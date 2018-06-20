@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 
 	"github.com/golang/glog"
 )
@@ -30,7 +31,7 @@ const (
 	bindResourceRouteKey   = "route"
 )
 
-func (c *client) Bind(r *BindRequest) (*BindResponse, error) {
+func (c *client) Bind(ctx context.Context, r *BindRequest) (*BindResponse, error) {
 	if r.AcceptsIncomplete {
 		if err := c.validateAlphaAPIMethodsAllowed(); err != nil {
 			return nil, AsyncBindingOperationsNotAllowedError{
@@ -70,7 +71,7 @@ func (c *client) Bind(r *BindRequest) (*BindResponse, error) {
 		}
 	}
 
-	response, err := c.prepareAndDo(http.MethodPut, fullURL, params, requestBody, r.OriginatingIdentity)
+	response, err := c.prepareAndDo(ctx, http.MethodPut, fullURL, params, requestBody, r.OriginatingIdentity)
 	if err != nil {
 		return nil, err
 	}

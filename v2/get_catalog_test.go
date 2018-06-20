@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"context"
 )
 
 const okCatalogBytes = `{
@@ -365,7 +366,7 @@ func TestGetCatalog(t *testing.T) {
 
 		klient := newTestClient(t, tc.name, tc.version, tc.enableAlpha, httpChecks, tc.httpReaction)
 
-		response, err := klient.GetCatalog()
+		response, err := klient.GetCatalog(context.TODO())
 
 		doResponseChecks(t, tc.name, response, err, tc.expectedResponse, tc.expectedErrMessage, tc.expectedErr)
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"context"
 )
 
 func defaultUpdateInstanceRequest() *UpdateInstanceRequest {
@@ -316,7 +317,7 @@ func TestUpdateInstanceInstance(t *testing.T) {
 
 		klient := newTestClient(t, tc.name, tc.version, tc.enableAlpha, tc.httpChecks, tc.httpReaction)
 
-		response, err := klient.UpdateInstance(tc.request)
+		response, err := klient.UpdateInstance(context.TODO(), tc.request)
 
 		doResponseChecks(t, tc.name, response, err, tc.expectedResponse, tc.expectedErrMessage, tc.expectedErr)
 	}

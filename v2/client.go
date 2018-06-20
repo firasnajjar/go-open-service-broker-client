@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/golang/glog"
+	"context"
 )
 
 const (
@@ -66,6 +67,8 @@ func NewClient(config *ClientConfiguration) (Client, error) {
 		Verbose:             config.Verbose,
 		httpClient:          httpClient,
 	}
+
+	c.UpdateRequestFunc = config.UpdateRequestFunc
 	c.doRequestFunc = c.doRequest
 
 	if config.AuthConfig != nil {
@@ -85,6 +88,7 @@ func NewClient(config *ClientConfiguration) (Client, error) {
 var _ CreateFunc = NewClient
 
 type doRequestFunc func(request *http.Request) (*http.Response, error)
+type UpdateRequestFunc func(request *http.Request, ctx context.Context) (*http.Request)
 
 // client provides a functional implementation of the Client interface.
 type client struct {
@@ -94,9 +98,10 @@ type client struct {
 	AuthConfig          *AuthConfig
 	EnableAlphaFeatures bool
 	Verbose             bool
+	UpdateRequestFunc   UpdateRequestFunc
 
-	httpClient    *http.Client
-	doRequestFunc doRequestFunc
+	httpClient        *http.Client
+	doRequestFunc     doRequestFunc
 }
 
 var _ Client = &client{}
@@ -121,7 +126,7 @@ const (
 // message body, and executes the request, returning an http.Response or an
 // error.  Errors returned from this function represent http-layer errors and
 // not errors in the Open Service Broker API.
-func (c *client) prepareAndDo(method, URL string, params map[string]string, body interface{}, originatingIdentity *OriginatingIdentity) (*http.Response, error) {
+func (c *client) prepareAndDo(ctx context.Context, method, URL string, params map[string]string, body interface{}, originatingIdentity *OriginatingIdentity) (*http.Response, error) {
 	var bodyReader io.Reader
 
 	if body != nil {
@@ -171,6 +176,11 @@ func (c *client) prepareAndDo(method, URL string, params map[string]string, body
 
 	if c.Verbose {
 		glog.Infof("broker %q: doing request to %q", c.Name, URL)
+	}
+
+	if c.UpdateRequestFunc != nil {
+		//the zero value for a function in golang is nil
+		request = c.UpdateRequestFunc(request, ctx)
 	}
 
 	return c.doRequestFunc(request)

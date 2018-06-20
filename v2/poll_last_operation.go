@@ -3,9 +3,10 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 )
 
-func (c *client) PollLastOperation(r *LastOperationRequest) (*LastOperationResponse, error) {
+func (c *client) PollLastOperation(ctx context.Context, r *LastOperationRequest) (*LastOperationResponse, error) {
 	if err := validateLastOperationRequest(r); err != nil {
 		return nil, err
 	}
@@ -25,7 +26,7 @@ func (c *client) PollLastOperation(r *LastOperationRequest) (*LastOperationRespo
 		params[VarKeyOperation] = opStr
 	}
 
-	response, err := c.prepareAndDo(http.MethodGet, fullURL, params, nil /* request body */, r.OriginatingIdentity)
+	response, err := c.prepareAndDo(ctx, http.MethodGet, fullURL, params, nil /* request body */, r.OriginatingIdentity)
 	if err != nil {
 		return nil, err
 	}

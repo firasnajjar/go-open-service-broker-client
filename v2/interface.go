@@ -2,6 +2,7 @@ package v2
 
 import (
 	"crypto/tls"
+	"context"
 )
 
 // AuthConfig is a union-type representing the possible auth configurations a
@@ -66,6 +67,12 @@ type ClientConfiguration struct {
 	CAData []byte
 	// Verbose is whether the client will log to glog.
 	Verbose bool
+	// A request updater. Useful in cases where the requests made by osb client have to be
+	// changed for some reason. A typical case is adding tracing capability that is based on
+	// HTTP headers.
+	// This function receives a pointer to the http.Request it should mutate and the context
+	// that was sent to one of the operation functions: Bind, UpdateServiceInstance, etc...
+	UpdateRequestFunc UpdateRequestFunc
 }
 
 // DefaultClientConfiguration returns a default ClientConfiguration:
@@ -99,7 +106,7 @@ type Client interface {
 	// GetCatalog returns information about the services the broker offers and
 	// their plans or an error.  GetCatalog calls GET on the Broker's catalog
 	// endpoint (/v2/catalog).
-	GetCatalog() (*CatalogResponse, error)
+	GetCatalog(ctx context.Context) (*CatalogResponse, error)
 	// ProvisionInstance requests that a new instance of a service be
 	// provisioned and returns information about the instance or an error.
 	// ProvisionInstance does a PUT on the Broker's endpoint for the requested
@@ -109,7 +116,7 @@ type Client interface {
 	// broker may complete the request asynchronously.  Callers should check
 	// the value of the Async field on the response and check the operation
 	// status using PollLastOperation if the Async field is true.
-	ProvisionInstance(r *ProvisionRequest) (*ProvisionResponse, error)
+	ProvisionInstance(ctx context.Context, r *ProvisionRequest) (*ProvisionResponse, error)
 	// UpdateInstance requests that an instances plan or parameters be updated
 	// and returns information about asynchronous responses or an error.
 	// UpdateInstance does a PATCH on the Broker's endpoint for the requested
@@ -119,7 +126,7 @@ type Client interface {
 	// broker may complete the request asynchronously.  Callers should check
 	// the value of the Async field on the response and check the operation
 	// status using PollLastOperation if the Async field is true.
-	UpdateInstance(r *UpdateInstanceRequest) (*UpdateInstanceResponse, error)
+	UpdateInstance(ctx context.Context, r *UpdateInstanceRequest) (*UpdateInstanceResponse, error)
 	// DeprovisionInstance requests that an instances plan or parameters be
 	// updated and returns information about asynchronous responses or an
 	// error. DeprovisionInstance does a DELETE on the Broker's endpoint for
@@ -131,7 +138,7 @@ type Client interface {
 	// status using PollLastOperation if the Async field is true.  Note that
 	// there are special semantics for PollLastOperation when checking the
 	// status of deprovision operations; see the doc for that method.
-	DeprovisionInstance(r *DeprovisionRequest) (*DeprovisionResponse, error)
+	DeprovisionInstance(ctx context.Context, r *DeprovisionRequest) (*DeprovisionResponse, error)
 	// PollLastOperation sends a request to query the last operation for a
 	// service instance to the broker and returns information about the
 	// operation or an error.  PollLastOperation does a GET on the broker's
@@ -146,7 +153,7 @@ type Client interface {
 	// an asynchronous deprovision, callers check the status of an
 	// asynchronous deprovision, callers should test the value of the returned
 	// error with IsGoneError.
-	PollLastOperation(r *LastOperationRequest) (*LastOperationResponse, error)
+	PollLastOperation(ctx context.Context, r *LastOperationRequest) (*LastOperationResponse, error)
 	// PollBindingLastOperation is an ALPHA API method and may change.
 	// Alpha features must be enabled and the client must be using the
 	// latest API Version in order to use this method.
@@ -164,17 +171,17 @@ type Client interface {
 	// deleted.  When calling PollBindingLastOperation to check the status of
 	// an asynchronous unbind, callers should test the value of the returned
 	// error with IsGoneError.
-	PollBindingLastOperation(r *BindingLastOperationRequest) (*LastOperationResponse, error)
+	PollBindingLastOperation(ctx context.Context, r *BindingLastOperationRequest) (*LastOperationResponse, error)
 	// Bind requests a new binding between a service instance and an
 	// application and returns information about the binding or an error. Bind
 	// does a PUT on the Broker's endpoint for the requested instance and
 	// binding IDs (/v2/service_instances/instance-id/service_bindings/binding-id).
-	Bind(r *BindRequest) (*BindResponse, error)
+	Bind(ctx context.Context, r *BindRequest) (*BindResponse, error)
 	// Bind requests that a binding between a service instance and an
 	// application be deleted and returns information about the binding or an
 	// error. Unbind does a DELETE on the Broker's endpoint for the requested
 	// instance and binding IDs (/v2/service_instances/instance-id/service_bindings/binding-id).
-	Unbind(r *UnbindRequest) (*UnbindResponse, error)
+	Unbind(ctx context.Context, r *UnbindRequest) (*UnbindResponse, error)
 	// GetBinding is an ALPHA API method and may change. Alpha features must
 	// be enabled and the client must be using the latest API Version in
 	// order to use this method.
@@ -183,7 +190,7 @@ type Client interface {
 	// about an existing binding. GetBindings calls GET on the Broker's
 	// binding endpoint
 	// (/v2/service_instances/instance-id/service_bindings/binding-id)
-	GetBinding(r *GetBindingRequest) (*GetBindingResponse, error)
+	GetBinding(ctx context.Context, r *GetBindingRequest) (*GetBindingResponse, error)
 }
 
 // CreateFunc allows control over which implementation of a Client is

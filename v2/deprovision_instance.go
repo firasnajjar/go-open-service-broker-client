@@ -3,9 +3,10 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 )
 
-func (c *client) DeprovisionInstance(r *DeprovisionRequest) (*DeprovisionResponse, error) {
+func (c *client) DeprovisionInstance(ctx context.Context, r *DeprovisionRequest) (*DeprovisionResponse, error) {
 	if err := validateDeprovisionRequest(r); err != nil {
 		return nil, err
 	}
@@ -20,7 +21,7 @@ func (c *client) DeprovisionInstance(r *DeprovisionRequest) (*DeprovisionRespons
 		params[AcceptsIncomplete] = "true"
 	}
 
-	response, err := c.prepareAndDo(http.MethodDelete, fullURL, params, nil, r.OriginatingIdentity)
+	response, err := c.prepareAndDo(ctx, http.MethodDelete, fullURL, params, nil, r.OriginatingIdentity)
 	if err != nil {
 		return nil, err
 	}

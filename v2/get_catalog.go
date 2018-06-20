@@ -3,12 +3,13 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 )
 
-func (c *client) GetCatalog() (*CatalogResponse, error) {
+func (c *client) GetCatalog(ctx context.Context, ) (*CatalogResponse, error) {
 	fullURL := fmt.Sprintf(catalogURL, c.URL)
 
-	response, err := c.prepareAndDo(http.MethodGet, fullURL, nil /* params */, nil /* request body */, nil /* originating identity */)
+	response, err := c.prepareAndDo(ctx, http.MethodGet, fullURL, nil /* params */, nil /* request body */, nil /* originating identity */)
 	if err != nil {
 		return nil, err
 	}

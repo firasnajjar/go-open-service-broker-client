@@ -3,9 +3,10 @@ package v2
 import (
 	"fmt"
 	"net/http"
+	"context"
 )
 
-func (c *client) PollBindingLastOperation(r *BindingLastOperationRequest) (*LastOperationResponse, error) {
+func (c *client) PollBindingLastOperation(ctx context.Context, r *BindingLastOperationRequest) (*LastOperationResponse, error) {
 	if err := c.validateAlphaAPIMethodsAllowed(); err != nil {
 		return nil, AsyncBindingOperationsNotAllowedError{
 			reason: err.Error(),
@@ -31,7 +32,7 @@ func (c *client) PollBindingLastOperation(r *BindingLastOperationRequest) (*Last
 		params[VarKeyOperation] = opStr
 	}
 
-	response, err := c.prepareAndDo(http.MethodGet, fullURL, params, nil /* request body */, r.OriginatingIdentity)
+	response, err := c.prepareAndDo(ctx, http.MethodGet, fullURL, params, nil /* request body */, r.OriginatingIdentity)
 	if err != nil {
 		return nil, err
 	}

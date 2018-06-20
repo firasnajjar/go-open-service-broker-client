@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"context"
 )
 
 const okBindingBytes = `{
@@ -110,7 +111,7 @@ func TestGetBinding(t *testing.T) {
 
 		klient := newTestClient(t, tc.name, tc.APIVersion, tc.enableAlpha, httpChecks, tc.httpReaction)
 
-		response, err := klient.GetBinding(tc.request)
+		response, err := klient.GetBinding(context.TODO(), tc.request)
 
 		doResponseChecks(t, tc.name, response, err, tc.expectedResponse, tc.expectedErrMessage, tc.expectedErr)
 	}
