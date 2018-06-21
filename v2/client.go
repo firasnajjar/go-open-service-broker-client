@@ -69,6 +69,7 @@ func NewClient(config *ClientConfiguration) (Client, error) {
 	}
 
 	c.UpdateRequestFunc = config.UpdateRequestFunc
+
 	c.doRequestFunc = c.doRequest
 
 	if config.AuthConfig != nil {
